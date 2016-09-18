@@ -1,4 +1,27 @@
 \documentclass{article}
 
+\usepackage{tabulary}
+\usepackage{hyperref}
+
 \begin{document}
+\title{GPU - hw 1}
+\author{Anirudhan J. Rajagopalan --- N18824115}
+\maketitle
+
+\newpage
+
+\begin{tabulary}{\textwidth}{LLLLL}
+    \bfseries
+    Gpu Model & \bfseries Memory (GB) &\bfseries Num Cores &\bfseries Bandwidth (GB/sec) &\bfseries Year \mdseries \\
+    \hline \\
+    GTX Titan X~\cite{gpu:titan_x} & 12 GB GDDR5 & 3072 & 336.5 & March, 2015 \\\\
+    GTX 980 Ti~\cite{gpu:980_ti} & 6GB GDDR5 & 2816 & 336.5 & June, 2015 \\\\
+    GTX 1080~\cite{gpu:gtx_1080} &  8 GB GDDR5X & 2560 & 320 & May, 2016    \\\\
+    GTX 1070~\cite{gpu:gtx_1070} & 8 GB GDDR5 & 1920 & 256 & June, 2016 \\\\
+    GTX 1060~\cite{gpu:gtx_1060} & 6 GB GDDR5 & 1280 & 192 & July, 2016 \\\\
+\end{tabulary}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
 \end{document}
