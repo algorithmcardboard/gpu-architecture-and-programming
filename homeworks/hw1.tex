@@ -32,6 +32,28 @@ Based on the table above, we can see that the memory bottleneck can be expected 
 
 
 \section{Q3}
+\subsection{Five applications of GPU}
+GPUs excel in performing simple operations in parallel streams of data.  Listed below are five applications of GPUs that fit this bill.
+\begin{enumerate}
+    \item  Computational Finance - Simulations and in Monte Carlo simulations.
+    \item  Deep Learning \& Machine Learning - Many of the deep learning problems are forumlated as matrix operations which can be done efficiently in GPUs.
+    \item  Crypto currency mining - Since crypto currency mining is a repeated calculation of SHA256 checksums~\cite{so:bitcoin}
+    \item  Graphics rendering - Graphics and computer animations are inherently small vector operations done at multiple pixel positions.
+    \item  Defense and Intelligence~\cite{gpu:defence_intelligence} -  Defense and intelligence requires data from wide array of sensors which has to be collected parallely and converted into actionable items in real time.  GPUs help in this process.
+\end{enumerate}
+
+\section{Q4}
+\subsection{Impact of the amount of data on GPU performance}
+Yes, The amount of data has a definite influence on the performance of the system.  If the amount of data is small, then moving the information from CPU's memory to GPU will be a big component of the time taken to perform the task and due to this, we might not observe any definite performance gains.  But if the amount of data is huge, using GPUs will most certainly give better performance in this scenario.
+
+\section{Q5}
+\subsection{Beneficial for GPU implementation?}
+\subsubsection{Finding whether a number exists in an array of 10M numbers}
+This can essentially be done as performing the simple equals operation on 10M numbers at the same time.  Since this involves a simple operation on independent data, we can implement this in a GPU.
+\subsubsection{Calculating the first 1M fibonacci numbers}
+Fibonacci number calculation is essentially a sequential operation which is difficult to parallelize.  So it is not well suited for GPU implemntation.
+\subsubsection{Multiplying 1000$\times$1000 matrices}
+Matrix multiplication is well suited for GPU implementation.  There are parallel algorithms for matrix multiplication which can then be implemented using GPUs.
 
 \bibliographystyle{plain}
 \bibliography{references}
