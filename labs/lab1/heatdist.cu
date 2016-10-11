@@ -222,20 +222,14 @@ void  gpu_heat_dist(float * playground, unsigned int N, unsigned int iterations)
 	cudaMalloc((void **) &d_playground, size * sizeof(float));
 	cudaMalloc((void **) &d_temp, size *sizeof(float));
 
-	dim3 dimGrid(ceil(N*N/256.0), 1, 1);
-	dim3 dimBlock(16, 16, 1);
-	//printf("N is %d \n",N);
-
 	cudaMemcpy(d_playground, playground, size*sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_temp, playground, size*sizeof(float), cudaMemcpyHostToDevice);
 
-	while(iter > 0){
-		/*
-		for(int i = 0; i < N*N; i++){
-			printf("%d %f \n", i, playground[i]);
-		}
-		*/
+	dim3 dimGrid(ceil(N*N/256.0), 1, 1);
+	dim3 dimBlock(16, 16, 1);
+	printf("N is %d \n",N);
 
+	while(iter > 0){
 		calculate_temperature<<<dimGrid, dimBlock>>>(d_temp, d_playground, N);
 		cudaMemcpy(d_playground, d_temp, size*sizeof(float), cudaMemcpyDeviceToDevice);
 		iter = iter -1;
