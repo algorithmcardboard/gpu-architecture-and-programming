@@ -27,6 +27,9 @@
 /* To index element (i,j) of a 2D array stored as 1D */
 #define index(i, j, N)  ((i)*(N)) + (j)
 
+/* Block width definition */
+#define BLOCK_WIDTH 16
+
 /*****************************************************************/
 
 // Function declarations: Feel free to add any functions you want.
@@ -211,7 +214,7 @@ void  gpu_heat_dist(float * playground, unsigned int N, unsigned int iterations)
 	// Loop indices
 	//int i, j, k;
 	//int upper = N-1;
-	//int iter = iterations;
+	int iter = iterations;
 
 	int size = N*N;
 	float *d_playground, *d_temp;
@@ -219,20 +222,24 @@ void  gpu_heat_dist(float * playground, unsigned int N, unsigned int iterations)
 	cudaMalloc((void **) &d_playground, size * sizeof(float));
 	cudaMalloc((void **) &d_temp, size *sizeof(float));
 
+	dim3 dimGrid(ceil(N*N/256.0), 1, 1);
+	dim3 dimBlock(16, 16, 1);
+	//printf("N is %d \n",N);
+
 	cudaMemcpy(d_playground, playground, size*sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_temp, playground, size*sizeof(float), cudaMemcpyHostToDevice);
 
-	dim3 dimGrid(ceil(N*N/256.0), 1, 1);
-	dim3 dimBlock(16, 16, 1);
+	while(iter > 0){
+		/*
+		for(int i = 0; i < N*N; i++){
+			printf("%d %f \n", i, playground[i]);
+		}
+		*/
 
-	printf("N is %d \n",N);
-
-	for(int i = 0; i < N*N; i++){
-		printf("%d %f \n", i, playground[i]);
+		calculate_temperature<<<dimGrid, dimBlock>>>(d_temp, d_playground, N);
+		cudaMemcpy(d_playground, d_temp, size*sizeof(float), cudaMemcpyDeviceToDevice);
+		iter = iter -1;
 	}
-
-	calculate_temperature<<<dimGrid, dimBlock>>>(d_temp, d_playground, N);
-
 	cudaMemcpy(playground, d_temp, size*sizeof(float), cudaMemcpyDeviceToHost);
 
 	cudaFree(d_temp);
