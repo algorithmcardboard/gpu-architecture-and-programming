@@ -60,10 +60,10 @@ int main(int argc, char * argv[])
 	N = (unsigned int) atoi(argv[1]);
 	iterations = (unsigned int) atoi(argv[2]);
 
-	printf("N \t cpu_time \t gpu_time \t cpu_sum \t gpu_sum");
+	printf("N \t block_size \t cpu_time \t gpu_time \t cpu_sum \t gpu_sum \n");
 
 	N = 100;
-	while(N < 10 * 1000){
+	while(N < 30 * 1000){
 		for(int i = 0; i < 3; i++){
 			do_heat_distribution(N, block_sizes[i], iterations);
 		}
@@ -109,7 +109,7 @@ void do_heat_distribution(unsigned int N, unsigned int block_size, unsigned int 
 
 	free(playground);
 
-	printf("%d \t %lf \t %lf \t %f \t %f \n", N, cpu_time, gpu_time, cpu_sum, gpu_sum);
+	printf("%d \t %d \t %lf \t %lf \t %f \t %f \n", N, block_size, cpu_time, gpu_time, cpu_sum, gpu_sum);
 
 }
 
