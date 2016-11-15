@@ -25,14 +25,15 @@ int main(int argc, char** argv){
     arr[0] = 1;
 
     int lastPrime = 1;
-    while(lastPrime < N){
+    do{
         int prime = findNextPrime(arr, N, lastPrime);
+        //printf("prime is %d", prime);
         for(int i = prime * 2; i <= N; i = i + prime){
             arr[i - 1] = 1;
             //printf("prime is %d. Index is %d.  Value is %d\n", prime, i, arr[i-1]);
         }
         lastPrime = prime;
-    }
+    }while(lastPrime < (N+1)/2);
 
     for(int i = 0; i < N; i++){
         if(arr[i] == 0){
