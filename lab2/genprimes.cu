@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h> 
+#include <math.h> 
 
 typedef int TYPE;
 
@@ -39,11 +40,15 @@ void fill_zeros(TYPE* arr, unsigned int N){
     }
 }
 
+int* findAllPrimes(unsigned int N){
+}
+
 __host__
 TYPE* find_primes(unsigned int N){
     unsigned int i  = 0;
     TYPE* arr = (TYPE*) malloc(N * sizeof(TYPE));
     fill_zeros(arr);
+    int* primes = find_all_primes(sqrt(N));
     // Find all primes till sqrt(n)
 
     // Call threads with two lists.  One with array of numbers.  The other with all primes till sqrt(n).
