@@ -25,10 +25,9 @@ int main(int argc, char** argv){
     arr[0] = 1;
 
     unsigned int lastPrime = 1;
-    unsigned int stopValue = (N+1)/2 + 1;
-    while(lastPrime < stopValue){
+    do{
         unsigned int prime = findNextPrime(arr, N, lastPrime);
-        for(unsigned int i = prime * prime; i <= N; i = i + prime){
+        for(unsigned int i = prime * 2; i <= N; i = i + prime){
             arr[i - 1] = 1;
             //printf("prime is %d. Index is %d.  Value is %d\n", prime, i, arr[i-1]);
         }
