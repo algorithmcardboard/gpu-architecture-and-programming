@@ -12,10 +12,12 @@
 #include <stdio.h>
 #include <time.h> 
 #include <math.h> 
+#include <cuda_profiler_api.h>
 
 typedef unsigned int TYPE;
 
 #define BLOCK_WIDTH 1024
+#define PRIME_SIZE 2046
 
 TYPE* find_primes(unsigned int, int);
 __global__
@@ -37,10 +39,10 @@ int main(int argc, char * argv[]){
 
     unsigned int count = 0;
 
-    TYPE* arr = find_primes(N, 20);
+    TYPE* arr = find_primes(N, N>10240?PRIME_SIZE:1);
     for(i = 0; i < N; i++){
         if(arr[i] == 0){
-            printf("%d ", i + 1);
+            //printf("%d ", i + 1);
             count = count + 1;
         }
     }
@@ -77,6 +79,7 @@ TYPE* find_primes(unsigned int N, int k){
     fill_zeros(arr, N);
     arr[0] = 1;
 
+    cudaProfilerStart();
 	TYPE *d_arr, *d_primes;
 
 	cudaMalloc((void **) &d_arr, N*sizeof(TYPE));
@@ -106,6 +109,7 @@ TYPE* find_primes(unsigned int N, int k){
     }while(last_prime < (N+1)/2);
 
     cudaMemcpy(arr, d_arr, N*sizeof(TYPE), cudaMemcpyDeviceToHost);
+    cudaProfilerStop();
     return arr;
 }
 
@@ -114,7 +118,7 @@ void do_seieve(TYPE* d_arr, unsigned int* d_primes, unsigned int N, int k){
 
     int i, id = blockIdx.x * blockDim.x + threadIdx.x + 1;
 
-    if(id > N){
+    if(id > N || d_arr[id-1] == 1 || id < d_primes[0]+1){
         return;
     }
 
@@ -122,6 +126,7 @@ void do_seieve(TYPE* d_arr, unsigned int* d_primes, unsigned int N, int k){
     for(i = 0; i < k; i++){
         if(id != (d_primes[i]+1) && (id % (d_primes[i]+1) == 0)){
             d_arr[id -1] = 1;
+            break;
             //printf("id is %d. prime is %d\n", id, d_primes[i]+1);
         }
     }
