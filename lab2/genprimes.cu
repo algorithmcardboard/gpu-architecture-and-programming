@@ -39,10 +39,18 @@ int main(int argc, char * argv[]){
 
     unsigned int count = 0;
 
-    TYPE* arr = find_primes(N, N>10240?PRIME_SIZE:1);
+    TYPE* arr = find_primes(N, N>10240?PRIME_SIZE:4);
+
+    char buf[12];
+    sprintf(buf, "%d.txt", N);
+    FILE *fp = fopen(buf,"a");
+    if(fp == NULL){
+        printf("error opening file");
+        return 0;
+    }
     for(i = 0; i < N; i++){
         if(arr[i] == 0){
-            //printf("%d ", i + 1);
+            fprintf(fp, "%d ", i + 1);
             count = count + 1;
         }
     }

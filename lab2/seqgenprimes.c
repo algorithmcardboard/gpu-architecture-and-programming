@@ -21,6 +21,8 @@ int main(int argc, char** argv){
     }
 
     unsigned int N = atoi(argv[1]);
+    unsigned int i;
+    int count = 0;
     TYPE* arr = (TYPE*)calloc(N, sizeof(TYPE));
     arr[0] = 1;
 
@@ -34,9 +36,18 @@ int main(int argc, char** argv){
         lastPrime = prime;
     }while(lastPrime < (N+1)/2);
 
-    for(unsigned int i = 0; i < N; i++){
+    char buf[12];
+    sprintf(buf, "%d.txt", N);
+    FILE *fp = fopen(buf,"a");
+    if(fp == NULL){
+        printf("error opening file");
+        return 0;
+    }
+    for(i = 0; i < N; i++){
         if(arr[i] == 0){
-            printf("%d ", i+1);
+            fprintf(fp, "%d ", i + 1);
+            count = count + 1;
         }
     }
+    printf("Count is %d\n", count);
 }
