@@ -15,10 +15,11 @@
 
 typedef unsigned int TYPE;
 
-#define BLOCK_WIDTH 1024;
+#define BLOCK_WIDTH 1024
 
-TYPE* find_primes(unsigned int);
-void do_seieve(TYPE*, unsigned int);
+TYPE* find_primes(unsigned int, int);
+__global__
+void do_seieve(TYPE*, unsigned int*, unsigned int, int);
 void fill_zeros(TYPE*, unsigned int);
 
 int main(int argc, char * argv[]){
@@ -31,10 +32,9 @@ int main(int argc, char * argv[]){
 
     N = atoi(argv[1]);
 
-    find_primes(N);
+    find_primes(N, 1);
 }
 
-__host__ __device__
 void fill_zeros(TYPE* arr, unsigned int N){
     unsigned int i = 0;
     for(i= 0; i < N; i++){
@@ -42,30 +42,62 @@ void fill_zeros(TYPE* arr, unsigned int N){
     }
 }
 
+unsigned int* find_next_primes(unsigned int* arr, unsigned int* primes, unsigned int last_prime, int k, unsigned int N){
+    int i = 0;
+    int j = last_prime;
+    for(j = last_prime; j < N && i < k; j++){
+        if(arr[j] == 0){
+            primes[i++] = j + 1;
+        }
+    }
+
+    return primes;
+}
+
 __host__
-TYPE* find_primes(unsigned int N){
-    unsigned int i  = 0;
+TYPE* find_primes(unsigned int N, int k){
     TYPE* arr = (TYPE*) malloc(N * sizeof(TYPE));
-    fill_zeros(arr);
+    fill_zeros(arr, N);
 
-    int* primes = find_all_primes(sqrt(N));
-
-	TYPE *d_arr;
+	TYPE *d_arr, *d_primes;
 
 	cudaMalloc((void **) &d_arr, N*sizeof(TYPE));
+	cudaMalloc((void **) &d_primes, k*sizeof(int));
 
-	cudaMemcpy(d_arr, arr, N*sizeof(TYPE), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_arr, arr, N*sizeof(TYPE), cudaMemcpyHostToDevice);;
 
 	dim3 gridDimension(ceil(N/(float)BLOCK_WIDTH), 1, 1);
 	dim3 blockDimension(BLOCK_WIDTH, 1, 1);
 
-    unsigned int nextPrime = 1;
-    unsigned int stopValue = (N+1)/2 + 1;
+    int i = 0;
+    d_arr[0] = 1;
+
+    unsigned int last_prime = 1;
+    unsigned int* primes = (unsigned int*)malloc(k*sizeof(int));
 
     do{
-    }while(nextPrime < (N+1)/2);
+        primes = find_next_primes(arr, primes, last_prime, k, N);
+        for(i = 0; i < k; i++){
+            if(*(primes + i) > last_prime){
+                last_prime = *(primes + i);
+            }
+        }
+        cudaMemcpy(d_primes, primes, N*sizeof(int), cudaMemcpyHostToDevice);
+        do_seieve<<<gridDimension, blockDimension>>>(d_arr, d_primes, N, k);
+    }while(last_prime < (N+1)/2);
+
+    cudaMemcpy(arr, d_arr, N*sizeof(TYPE), cudaMemcpyDeviceToHost);
+    return arr;
 }
 
 __global__
-void do_seieve(TYPE* arr, unsigned int N){
+void do_seieve(TYPE* d_arr, unsigned int* d_primes, unsigned int N, int k){
+	int id = blockIdx.x * blockDim.x + threadIdx.x;
+
+    int i = 0;
+    for(i = 0; i < k; i++){
+        if(id % d_primes[k] == 0){
+            d_arr[id] = 1;
+        }
+    }
 }
