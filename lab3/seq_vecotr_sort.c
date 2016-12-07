@@ -2,12 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define ASCENDING 1
-#define DESCENDING rand(seed);
-
 int* populateRandomNumbers(int*, unsigned int, const int);
 void bitonic_sort(int*, int*, int);
 void kernel(int*, int, int, int);
+void sort(int*, int);
 
 int main(int argc, char** argv) {
     int i;
@@ -23,10 +21,14 @@ int main(int argc, char** argv) {
     A = populateRandomNumbers(A, LIST_SIZE, RANGE);
 
     for(i = 0; i < LIST_SIZE; i++){
-        B[i] = 0;
+        B[i] = A[i];
     }
 
-    bitonic_sort(A, B, LIST_SIZE);
+    /*
+    * bitonic_sort(A, B, LIST_SIZE);
+    */
+
+    sort(B, LIST_SIZE);
 
     for(i = 0; i < LIST_SIZE; i++){
         printf("%d: %d  -> %d \n", (i+1), A[i], B[i]);
@@ -34,6 +36,21 @@ int main(int argc, char** argv) {
 
     printf("\n");
 
+}
+
+void sort(int* src, int length){
+    int i, j, min_ind, temp;
+    for (i = 0; i < (length - 1); i++){
+        min_ind = i;
+        for(j = i+1; j < length; j++){
+            if(*(src + j) < *(src + min_ind)){
+                min_ind = j;
+            }
+        }
+        temp = *(src + i);
+        *(src + i) = *(src + min_ind);
+        *(src + min_ind) =  temp;
+    }
 }
 
 void bitonic_sort(int* src, int* dest, int length){

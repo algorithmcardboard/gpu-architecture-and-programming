@@ -5,17 +5,47 @@
 
 #define MAX_SOURCE_SIZE (0x100000)
 
+int* populateRandomNumbers(int*, unsigned int, const int);
+
+int* populateRandomNumbers(int* A, unsigned int N, const int RANGE){
+    int i;
+    int *elements = malloc(sizeof(int)*RANGE);
+
+    // inizialize
+    for (i = 0; i < RANGE; ++i){
+        elements[i] = i;
+    }
+
+    for (i = RANGE - 1; i > 0; --i) {
+        int w = rand()%i;
+        int t = elements[i];
+        elements[i] = elements[w];
+        elements[w] = t;
+    }
+
+    for(i = 0; i < N; i++){
+        A[i] = elements[i];
+    }
+
+    return A;
+}
 
 int main(void) {
     // Create the two input vectors
     int i;
     const int LIST_SIZE = 1024;
+
+    //int seed = time(NULL);
+    //srand(seed);
+    int RANGE = 10000;
+
     int *A = (int*)malloc(sizeof(int)*LIST_SIZE);
     int *B = (int*)malloc(sizeof(int)*LIST_SIZE);
 
-    for(i = 0; i < LIST_SIZE; i++) {
-        A[i] = i;
-        B[i] = LIST_SIZE - i;
+    A = populateRandomNumbers(A, LIST_SIZE, RANGE);
+
+    for(i = 0; i < LIST_SIZE; i++){
+        B[i] = 0;
     }
  
     // Load the kernel source code into the array source_str
@@ -32,7 +62,7 @@ int main(void) {
     source_str = (char*)malloc(MAX_SOURCE_SIZE);
     source_size = fread( source_str, 1, MAX_SOURCE_SIZE, fp);
     fclose( fp );
- 
+
     // Get platform and device information
     cl_platform_id platform_id = NULL;
     cl_device_id device_id = NULL;   
@@ -49,18 +79,20 @@ int main(void) {
     cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
  
     // Create memory buffers on the device for each vector 
+    
     cl_mem a_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
             LIST_SIZE * sizeof(int), NULL, &ret);
-    cl_mem b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-            LIST_SIZE * sizeof(int), NULL, &ret);
-    cl_mem c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
+
+    cl_mem b_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, 
             LIST_SIZE * sizeof(int), NULL, &ret);
  
     // Copy the lists A and B to their respective memory buffers
     ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
             LIST_SIZE * sizeof(int), A, 0, NULL, NULL);
-    ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0, 
+    //printf("AFter writing A %d \n", ret);
+    ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
             LIST_SIZE * sizeof(int), B, 0, NULL, NULL);
+    //printf("AFter writing B %d \n", ret);
  
     // Create a program from the kernel source
     cl_program program = clCreateProgramWithSource(context, 1, 
@@ -68,30 +100,37 @@ int main(void) {
  
     // Build the program
     ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+    //printf("After building the program %d \n", ret);
  
     // Create the OpenCL kernel
-    cl_kernel kernel = clCreateKernel(program, "vector_add", &ret);
+    cl_kernel kernel = clCreateKernel(program, "parallel_sort", &ret);
  
     // Set the arguments of the kernel
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj);
+    //printf("First argument %d \n", ret);
     ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
-    ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
+    //printf("Second argument %d \n", ret);
+    ret = clSetKernelArg(kernel, 2, sizeof(int), (void *)&LIST_SIZE);
+
+    //printf("Third argument %d \n", ret);
  
     // Execute the OpenCL kernel on the list
     size_t global_item_size = LIST_SIZE; // Process the entire lists
     size_t local_item_size = 64; // Divide work items into groups of 64
+    //printf("About to run the kernel \n");
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, 
             &global_item_size, &local_item_size, 0, NULL, NULL);
+
+    //printf("%d", ret);
  
-    // Read the memory buffer C on the device to the local variable C
-    int *C = (int*)malloc(sizeof(int)*LIST_SIZE);
-    ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0, 
-            LIST_SIZE * sizeof(int), C, 0, NULL, NULL);
+    // Read the memory buffer B on the device to the local variable c
+    ret = clEnqueueReadBuffer(command_queue, b_mem_obj, CL_TRUE, 0, 
+            LIST_SIZE * sizeof(int), B, 0, NULL, NULL);
  
-    // Display the result to the screen
-    for(i = 0; i < LIST_SIZE; i++)
-        printf("%d + %d = %d\n", A[i], B[i], C[i]);
- 
+    for(i = 0; i < LIST_SIZE; i++){
+        printf("%d: %d  -> %d \n", (i+1), A[i], B[i]);
+    }
+
     // Clean up
     ret = clFlush(command_queue);
     ret = clFinish(command_queue);
@@ -99,12 +138,9 @@ int main(void) {
     ret = clReleaseProgram(program);
     ret = clReleaseMemObject(a_mem_obj);
     ret = clReleaseMemObject(b_mem_obj);
-    ret = clReleaseMemObject(c_mem_obj);
     ret = clReleaseCommandQueue(command_queue);
     ret = clReleaseContext(context);
     free(A);
     free(B);
-    free(C);
     return 0;
 }
-

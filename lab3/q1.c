@@ -5,7 +5,6 @@
 
 #define MAX_SOURCE_SIZE (0x100000)
 
-
 int main(void) {
     // Create the two input vectors
     int i;
@@ -22,7 +21,7 @@ int main(void) {
     char *source_str;
     size_t source_size;
  
-    fp = fopen("vector_add_kernel.cl", "r");
+    fp = fopen("q1.cl", "r");
     if (!fp) {
         fprintf(stderr, "Failed to load kernel.\n");
         exit(1);
