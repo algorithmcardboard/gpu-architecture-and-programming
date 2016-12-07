@@ -1,3 +1,10 @@
+/*
+ *  Name:  Anirudhan J. Rajagopalan
+ *  NetId: ajr619
+ *  N-no:  N18824115
+ *
+ * Comments:  Couldn't improve the performance of the algorithm.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 

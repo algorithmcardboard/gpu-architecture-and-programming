@@ -1,3 +1,9 @@
+/*
+ *  Name:  Anirudhan J. Rajagopalan
+ *  NetId: ajr619
+ *  N-no:  N18824115
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,8 +41,8 @@ int main(void) {
     int i;
     const int LIST_SIZE = 1024;
 
-    //int seed = time(NULL);
-    //srand(seed);
+    int seed = time(NULL);
+    srand(seed);
     int RANGE = 10000;
 
     int *A = (int*)malloc(sizeof(int)*LIST_SIZE);

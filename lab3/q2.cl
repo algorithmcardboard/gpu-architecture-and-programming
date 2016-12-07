@@ -1,3 +1,9 @@
+/*
+ *  Name:  Anirudhan J. Rajagopalan
+ *  NetId: ajr619
+ *  N-no:  N18824115
+ *
+ */
 __kernel void parallel_sort(__global int* A, __global int* B, uint n){
     uint id = get_global_id(0);
     int j, pos = 0;
