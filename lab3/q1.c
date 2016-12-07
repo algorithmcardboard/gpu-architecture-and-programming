@@ -3,7 +3,8 @@
  *  NetId: ajr619
  *  N-no:  N18824115
  *
- * Comments:  Couldn't improve the performance of the algorithm.
+ * Comments:  Cahnging to constants improved performance.
+ * Timing: real    0m0.135s
  */
 #include <stdio.h>
 #include <stdlib.h>

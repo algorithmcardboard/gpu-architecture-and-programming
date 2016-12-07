@@ -2,6 +2,7 @@
  *  Name:  Anirudhan J. Rajagopalan
  *  NetId: ajr619
  *  N-no:  N18824115
+ *  Time: 0m0.127s
  *
  */
 #include <stdio.h>
